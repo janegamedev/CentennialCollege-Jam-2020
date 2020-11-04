@@ -4,20 +4,23 @@ using Variables;
 
 public class InputHandler : MonoBehaviour
 {
-    public BoolVariable worldInRotation;
+    public BoolVariable actionInProgress;
     public WorldRotation worldRotation;
     public GridManager gridManager;
     
     private void Update()
     {
-        if(worldInRotation.value) return;
+        if(actionInProgress.value) return;
         
-        if(Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.RightArrow))
-            gridManager.MoveCharacter(Vector2Int.right);
-        
+        if (Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.RightArrow))
+            if (gridManager.TryMoveObject(gridManager.character.gridPos, Vector2Int.right))
+                gridManager.Invoke(nameof(gridManager.SimulatePhysics), .5f);
+               
+
         if(Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.LeftArrow))
-            gridManager.MoveCharacter(Vector2Int.left);
-        
+            if (gridManager.TryMoveObject(gridManager.character.gridPos, Vector2Int.left))
+                gridManager.Invoke(nameof(gridManager.SimulatePhysics), .5f);
+
         if(Input.GetKeyDown(KeyCode.E) || Input.GetKeyDown(KeyCode.UpArrow))
             worldRotation.RotateRoom(Vector2Int.right);
         

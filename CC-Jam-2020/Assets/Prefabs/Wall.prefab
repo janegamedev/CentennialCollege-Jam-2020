@@ -95,6 +95,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 20bd49397143421c820f5c6b5c4a9787, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  actionInProgress: {fileID: 11400000, guid: 528edd45b20f54e4a97af7ea296433ff, type: 2}
   data: {fileID: 0}
   gridPos: {x: 0, y: 0}
   ease: 0

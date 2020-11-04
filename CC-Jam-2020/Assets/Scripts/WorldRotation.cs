@@ -5,7 +5,7 @@ using Variables;
 
 public class WorldRotation : MonoBehaviour
 {
-    public BoolVariable worldInRotation;
+    public BoolVariable actionInProgress;
     private GridManager _gridManager;
     
     private int _rotation;
@@ -13,12 +13,12 @@ public class WorldRotation : MonoBehaviour
     private void Awake()
     {
         _gridManager = GetComponent<GridManager>();
-        worldInRotation.value = false;
+        actionInProgress.value = false;
     }
 
     public void RotateRoom(Vector2Int rot)
     {
-        worldInRotation.SetValue(true);
+        actionInProgress.SetValue(true);
         _rotation = (int) rot.x;
         
         Quaternion rotation = Quaternion.Euler(0, 0, 90 * _rotation);
@@ -46,7 +46,7 @@ public class WorldRotation : MonoBehaviour
 
     private void OnTileRotationEnd()
     {
-        worldInRotation.SetValue(false);
+        actionInProgress.SetValue(false);
         _gridManager.SimulatePhysics();
     }
 }

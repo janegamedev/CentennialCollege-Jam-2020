@@ -6,16 +6,15 @@ using Variables;
 [System.Serializable]
 public class TileInstance : MonoBehaviour
 {
+    public BoolVariable actionInProgress;
     [HideInInspector] public Tile data;
     [HideInInspector] public Vector2Int gridPos;
     public Ease ease;
-    private GridManager _gridManager;
 
     public void SetTile(GridManager gm, Tile d, Vector2Int pos)
     {
         data = d;
         gridPos = pos;
-        _gridManager = gm;
     }
 
     public void OnRoomRotated(int rot, float delay)
@@ -27,6 +26,14 @@ public class TileInstance : MonoBehaviour
 
     public void Move(Vector3 pos)
     {
-        transform.DOMove(pos, 0.5f).SetEase(Ease.OutBack);
+        if(!actionInProgress.value)
+            actionInProgress.SetValue(true);
+        transform.DOMove(pos, 0.5f).SetEase(Ease.OutBack).OnComplete(OnMoveEnd);
+    }
+
+    private void OnMoveEnd()
+    {
+        if(actionInProgress.value)
+            actionInProgress.SetValue(false);
     }
 }

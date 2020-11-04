@@ -12,18 +12,20 @@ public class GridManager : MonoBehaviour
 {
     public Grid setup;
     [TableList] public TileParent[] parents;
-    public BoolVariable worldInRotation;
 
     [TableMatrix][ShowInInspector]
     public TileInstance[,] _grid;
     private List<TileInstance> _tilesToRotate = new List<TileInstance>();
     private List<TileInstance> _tilesWithPhysics = new List<TileInstance>();
-    private TileInstance _character;
+    [HideInInspector] public TileInstance character;
     private float _offset;
     private int _half;
     private bool _isInit;
     public List<TileInstance> TilesToRotate => _tilesToRotate;
 
+    private void Unsubscribe(Vector2Int pos) => _grid[pos.x, pos.y] = null;
+    private void Subscribe(TileInstance t, Vector2Int pos) => _grid[pos.x, pos.y] = t;
+    
     private void Awake()
     {
         _grid = new TileInstance[setup.size, setup.size];
@@ -49,7 +51,7 @@ public class GridManager : MonoBehaviour
                 if(!t.isStatic)
                     _tilesWithPhysics.Add(_grid[x,y]);
                 if (t.isCharacter)
-                    _character = inst;
+                    character = inst;
             }
         }
 
@@ -60,7 +62,7 @@ public class GridManager : MonoBehaviour
     public void SimulatePhysics()
     {
         if(_tilesWithPhysics.Count < 1 || !_isInit) return;
-
+        
         List<TileInstance> sort = _tilesWithPhysics.OrderByDescending(x=>x.gridPos.y).ToList();
         
         foreach (TileInstance t in sort)
@@ -70,24 +72,35 @@ public class GridManager : MonoBehaviour
             MoveTileDown(t);
         }
     }
-
-    public void MoveCharacter(Vector2Int dir)
+    
+    public bool TryMoveObject(Vector2Int current, Vector2Int dir)
     {
-        if(!IsTileAvailable(_character.gridPos + dir)) return;
+        Vector2Int nextPos = current + dir;
 
-        worldInRotation.SetValue(true);
-        Vector2Int pos = _character.gridPos + dir;
-        _grid[_character.gridPos.x, _character.gridPos.y] = null;
-        _grid[pos.x, pos.y] = _character;
-        _character.gridPos = pos;
-        _character.Move(GridToWorld(pos));
-        Invoke(nameof(OnMoveEnd), .5f);
+        if (IsTileEmpty(nextPos))
+        {
+            MoveObject(current, nextPos);
+            return true;
+        }
+        
+        if (!IsTileMovable(nextPos)) return false;
+            
+        if (TryMoveObject(nextPos, dir))
+        {
+            MoveObject(current, nextPos);
+            return true;
+        }
+        
+        return false;
     }
 
-    private void OnMoveEnd()
+    private void MoveObject(Vector2Int current, Vector2Int next)
     {
-        worldInRotation.SetValue(false);
-        SimulatePhysics();
+        TileInstance t = _grid[current.x, current.y];
+        Subscribe(t, next);
+        Unsubscribe(current);
+        t.gridPos = next;
+        t.Move(GridToWorld(next));
     }
 
     public void RotateGrid(int dir)
@@ -133,31 +146,31 @@ public class GridManager : MonoBehaviour
         _grid = temp;
     }
 
-    public bool IsTileAvailable(Vector2Int pos)
-    {
-        return _grid[pos.x, pos.y] == null;
-        /*if (_grid[pos.x, pos.y] == null) return true;
+    private bool IsTileEmpty(Vector2Int pos) => _grid[pos.x, pos.y] == null;
 
-        return !_grid[pos.x, pos.y].data.isStatic;*/
-    }
-    
-    public bool HasTileBelow(TileInstance t) => _grid[t.gridPos.x, t.gridPos.y + 1] != null;
+    private bool IsTileMovable(Vector2Int pos) => !_grid[pos.x, pos.y].data.isStatic;
 
-    public void MoveTileDown(TileInstance t)
+    private bool HasTileBelow(TileInstance t) => _grid[t.gridPos.x, t.gridPos.y + 1] != null;
+
+    private void MoveTileDown(TileInstance t)
     {
+        bool beenMoved = false;
+        
         while (true)
         {
             if (_grid[t.gridPos.x, t.gridPos.y + 1] == null)
             {
-                _grid[t.gridPos.x, t.gridPos.y] = null;
+                Unsubscribe(t.gridPos);
                 t.gridPos = new Vector2Int(t.gridPos.x, t.gridPos.y + 1);
+                Subscribe(t, t.gridPos);
+                beenMoved = true;
             }
             else
                 break;
         }
-
-        _grid[t.gridPos.x, t.gridPos.y] = t;
-        t.Move(GridToWorld(t.gridPos));
+        
+        if(beenMoved)
+            t.Move(GridToWorld(t.gridPos));
     }
 
     #region Calculations
