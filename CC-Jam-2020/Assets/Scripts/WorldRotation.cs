@@ -1,20 +1,15 @@
 ﻿using System;
 using DG.Tweening;
+using Scriptables;
+using Sirenix.OdinInspector;
 using UnityEngine;
-using Variables;
 
 public class WorldRotation : MonoBehaviour
 {
-    public BoolVariable actionInProgress;
-    private GridManager _gridManager;
-    
-    private int _rotation;
+    [BoxGroup("VARIABLES")] public GridManagerVariable currentGrid;
+    [BoxGroup("VARIABLES")] public BoolVariable actionInProgress;
 
-    private void Awake()
-    {
-        _gridManager = GetComponent<GridManager>();
-        actionInProgress.value = false;
-    }
+    private int _rotation;
 
     public void RotateRoom(Vector2Int rot)
     {
@@ -22,23 +17,23 @@ public class WorldRotation : MonoBehaviour
         _rotation = (int) rot.x;
         
         Quaternion rotation = Quaternion.Euler(0, 0, 90 * _rotation);
-        rotation *= transform.rotation;
+        rotation *=  currentGrid.value.transform.rotation;
         
-        _gridManager.RotateGrid(_rotation);
-        transform.DORotateQuaternion(rotation, 0.5f).SetEase(Ease.OutBack).OnComplete(OnRotationEnd);
-        transform.DOScale(0.85f, 0.25f).SetEase(Ease.OutBack).OnComplete(OnScaleEnd);
+        currentGrid.value.RotateGrid(_rotation);
+        currentGrid.value.transform.DORotateQuaternion(rotation, 0.5f).SetEase(Ease.OutBack).OnComplete(OnRotationEnd);
+        currentGrid.value.transform.DOScale(0.85f, 0.25f).SetEase(Ease.OutBack).OnComplete(OnScaleEnd);
     }
 
     private void OnScaleEnd()
     {
-        transform.DOScale(1, 0.25f).SetEase(Ease.OutBack);
+        currentGrid.value.transform.DOScale(1, 0.25f).SetEase(Ease.OutBack);
     }
 
     private void OnRotationEnd()
     {
-        foreach (TileInstance instance in _gridManager.TilesToRotate)
+        foreach (ObjectInstance obj in currentGrid.value.RotationRequired)
         {
-            instance.OnRoomRotated(_rotation, 0.2f);
+            obj.OnRoomRotated(_rotation, 0.2f);
         }
 
         Invoke(nameof(OnTileRotationEnd), .3f);
@@ -47,6 +42,6 @@ public class WorldRotation : MonoBehaviour
     private void OnTileRotationEnd()
     {
         actionInProgress.SetValue(false);
-        _gridManager.SimulatePhysics();
+        currentGrid.value.SimulatePhysics();
     }
 }

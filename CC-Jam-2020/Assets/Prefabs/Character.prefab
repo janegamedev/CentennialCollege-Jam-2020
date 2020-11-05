@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3053666438921200607}
   - component: {fileID: 3053666438921200606}
-  - component: {fileID: -6372694347420215630}
+  - component: {fileID: 8988107523191581811}
   m_Layer: 8
   m_Name: Character
   m_TagString: Untagged
@@ -83,7 +83,7 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &-6372694347420215630
+--- !u!114 &8988107523191581811
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -92,10 +92,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 3053666438921200601}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 20bd49397143421c820f5c6b5c4a9787, type: 3}
+  m_Script: {fileID: 11500000, guid: 7f1651fa07b14736968f7f159a15ab93, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   actionInProgress: {fileID: 11400000, guid: 528edd45b20f54e4a97af7ea296433ff, type: 2}
   data: {fileID: 0}
   gridPos: {x: 0, y: 0}
-  ease: 8
+  tile:
+    objects: []
+  ease: 7
+  onPlayerMoved: {fileID: 11400000, guid: 035a432301974fc489d188df018e450e, type: 2}

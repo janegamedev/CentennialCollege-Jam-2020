@@ -1,111 +1,227 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using Scriptables;
 using Sirenix.OdinInspector;
 using UnityEngine;
-using Variables;
+using Utilities;
 using Quaternion = UnityEngine.Quaternion;
 using Vector3 = UnityEngine.Vector3;
 
 public class GridManager : MonoBehaviour
 {
-    public Grid setup;
+    [BoxGroup("SETTINGS")] public GridManager nextRoom, underworldRoom;
+    [BoxGroup("SETTINGS")] public Grid setup;
+    [BoxGroup("SETTINGS")] public Vector2IntVariable gravity;
+
+    [BoxGroup("TRANSFORMS")]
     [TableList] public TileParent[] parents;
+    
+    [BoxGroup("VARIABLES")] public BoolVariable hasKey;
+   
+    private Tile[,] _grid;
+    private List<ObjectInstance> _rotationRequired = new List<ObjectInstance>();
+    private List<ObjectInstance> _physicsApply = new List<ObjectInstance>();
+    [HideInInspector] public ObjectInstance character;
 
-    [TableMatrix][ShowInInspector]
-    public TileInstance[,] _grid;
-    private List<TileInstance> _tilesToRotate = new List<TileInstance>();
-    private List<TileInstance> _tilesWithPhysics = new List<TileInstance>();
-    [HideInInspector] public TileInstance character;
     private float _offset;
-    private int _half;
     private bool _isInit;
-    public List<TileInstance> TilesToRotate => _tilesToRotate;
+    public List<ObjectInstance> RotationRequired => _rotationRequired;
+   
+    
+    private void Unassign(ObjectInstance obj)
+    {
+        _grid.Value(obj.gridPos).RemoveObject(obj);
+    } 
 
-    private void Unsubscribe(Vector2Int pos) => _grid[pos.x, pos.y] = null;
-    private void Subscribe(TileInstance t, Vector2Int pos) => _grid[pos.x, pos.y] = t;
+    private void Assign(ObjectInstance obj, Vector2Int pos)
+    {
+        _grid.Value(pos).AddObject(obj);
+    }
     
     private void Awake()
     {
-        _grid = new TileInstance[setup.size, setup.size];
+        _grid = new Tile[setup.size, setup.size];
         _offset = setup.size / 2f - .5f;
-        _half = (int) _offset;
-        
+
         for (int y = 0; y < _grid.GetLength(0); y++)
         {
             for (int x = 0; x < _grid.GetLength(1); x++)
             {
-                if(setup.IsTileEmpty(x, y)) continue;
+                Vector2Int pos = new Vector2Int(x,y);
+                _grid[x,y] = new Tile(pos);
                 
-                Vector3 pos = GridToWorld(new Vector2Int(x,y));
-                Tile t = setup.GetTile(x, y);
+                if(setup.IsCellEmpty(x, y)) continue;
 
-                TileInstance inst = Instantiate(t.prefab, pos, Quaternion.identity, parents.First(p => p.type == t.type).parent).GetComponent<TileInstance>();
-                inst.SetTile(this, t, new Vector2Int(x,y));
-                inst.name = $"{t.tileName} - {x}:{y}";
-                _grid[x,y] = inst;
+                Vector3 worldPosition = WorldPosition(pos);
+         
+                Object obj = setup.GetObject(x, y);
                 
-                if(t.requireRotation)
-                    _tilesToRotate.Add(_grid[x,y]);
-                if(!t.isStatic)
-                    _tilesWithPhysics.Add(_grid[x,y]);
-                if (t.isCharacter)
-                    character = inst;
+                if (obj.isCharacter) continue;
+
+                ObjectInstance inst = Instantiate(obj.prefab, worldPosition, Quaternion.identity, parents.First(p => p.type == obj.type).parent).GetComponent<ObjectInstance>();
+                inst.SetObject(obj);
+                inst.name = $"{obj.tileName}";
+                
+                Assign(inst, pos);
+
+                if(obj.requireRotation)
+                    _rotationRequired.Add(inst);
+                if(obj.isMovable)
+                    _physicsApply.Add(inst);
             }
         }
 
+        hasKey.SetValue(false);
         _isInit = true;
+        SimulatePhysics();
+    }
+
+    public ObjectInstance SpawnCharacter()
+    {
+        Vector2Int pos = setup.CharacterSpawn;
+        Vector3 worldPosition = WorldPosition(pos);
+
+        Object obj = setup.character;
+
+        ObjectInstance inst = Instantiate(obj.prefab, worldPosition, Quaternion.identity, parents.First(p => p.type == obj.type).parent).GetComponent<ObjectInstance>();
+        inst.SetObject(obj);
+        inst.name = $"{obj.tileName}";
+                
+        Assign(inst, pos);
+        character = inst;
+        _physicsApply.Add(character);
+        _rotationRequired.Add(character);
+        SimulatePhysics();
+
+        return character;
+    }
+
+    public void RemoveCharacter()
+    {
+        _physicsApply.Remove(character);
+        _rotationRequired.Remove(character);
+        Unassign(character);
+        character = null;
+    }
+
+    public void AddCharacter(ObjectInstance c)
+    {
+        Vector2Int pos = setup.CharacterSpawn;
+        Vector3 worldPosition = WorldPosition(pos);
+        
+        Assign(c, pos);
+        character = c;
+        _physicsApply.Add(character);
+        _rotationRequired.Add(character);
         SimulatePhysics();
     }
 
     public void SimulatePhysics()
     {
-        if(_tilesWithPhysics.Count < 1 || !_isInit) return;
+        if(_physicsApply.Count < 1 || !_isInit) return;
         
-        List<TileInstance> sort = _tilesWithPhysics.OrderByDescending(x=>x.gridPos.y).ToList();
+        List<ObjectInstance> objects = _physicsApply.OrderByDescending(x=> x.gridPos.y).ToList();
         
-        foreach (TileInstance t in sort)
+        foreach (ObjectInstance obj in objects)
         {
-            if(HasTileBelow(t)) continue;
+            if(!IsTileEmpty(obj.gridPos + gravity.value)) continue;
             
-            MoveTileDown(t);
+            while (true)
+            {
+                if (IsTileEmpty(obj.gridPos + gravity.value))
+                {
+                    Unassign(obj);
+                    Assign(obj, obj.gridPos + gravity.value);
+                }
+                else
+                    break;
+            }
+            
+            obj.Move(WorldPosition(obj.gridPos));
         }
     }
-    
-    public bool TryMoveObject(Vector2Int current, Vector2Int dir)
-    {
-        Vector2Int nextPos = current + dir;
 
-        if (IsTileEmpty(nextPos))
+    public bool TryMoveObject(ObjectInstance obj, Vector2Int dir)
+    {
+        Vector2Int nextPos = obj.gridPos + dir;
+        Tile tile = _grid.Value(nextPos);
+
+        if (tile.IsEmpty)
         {
-            MoveObject(current, nextPos);
+            MoveObject(obj, nextPos);
             return true;
         }
-        
-        if (!IsTileMovable(nextPos)) return false;
+
+        if (tile.objects.Count == 1)
+        {
+            ObjectInstance nextObj = tile.objects[0];
             
-        if (TryMoveObject(nextPos, dir))
+            if (nextObj.data.isPassable)
+            {
+                MoveObject(obj, nextPos);
+                return true; 
+            }
+
+            if (nextObj.data.isMovable && TryMoveObject(nextObj, dir))
+            {
+                MoveObject(obj, nextPos);
+                return true;
+            }
+            return false;
+        }
+
+        if (!IsTileMovable(nextPos)) return false;
+
+        ObjectInstance movable = tile.GetMovable;
+        
+        if (TryMoveObject(movable, dir))
         {
-            MoveObject(current, nextPos);
+            MoveObject(movable, nextPos + dir);
             return true;
         }
-        
+       
         return false;
     }
 
-    private void MoveObject(Vector2Int current, Vector2Int next)
+    public void CheckForPlayer()
     {
-        TileInstance t = _grid[current.x, current.y];
-        Subscribe(t, next);
-        Unsubscribe(current);
-        t.gridPos = next;
-        t.Move(GridToWorld(next));
+        // Check for below stuff
+        List<ObjectInstance> below = _grid.Value(character.gridPos + gravity.value).objects;
+        
+        foreach (ObjectInstance instance in below)
+        {
+            instance.data.type.Interact(instance);
+        }
+        
+        //Check for key / door
+        List<ObjectInstance> sameTile = _grid.Value(character.gridPos).objects;
+
+        foreach (ObjectInstance instance in sameTile)
+        {
+            instance.data.type.Interact(instance);
+        }
+    }
+
+    private void MoveObject(ObjectInstance obj, Vector2Int next)
+    {
+        Unassign(obj);
+        Assign(obj, next);
+        obj.Move(WorldPosition(obj.gridPos));
     }
 
     public void RotateGrid(int dir)
     {
-        TileInstance[,] temp = new TileInstance[_grid.GetLength(0),_grid.GetLength(1)];
+        Tile[,] temp = new Tile[_grid.GetLength(0),_grid.GetLength(1)];
+
+        for (int y = 0; y < temp.GetLength(0); y++)
+        {
+            for (int x = 0; x < temp.GetLength(1); x++)
+            {
+                Vector2Int pos = new Vector2Int(x,y);
+                temp[x,y] = new Tile(pos);
+            }
+        }
 
         // Create a complex number with input -1/1 as imaginary number
         Complex m = new Complex(0, -dir);
@@ -114,11 +230,10 @@ public class GridManager : MonoBehaviour
         {
             for (int x = 0; x < temp.GetLength(1); x++)
             {
-                if(_grid[x,y] == null) continue;
-                
-                //TileInstance t = _grid[x, y];
-                //Vector2Int p = new Vector2Int(x /*- _half*/, y /*+ _half*/);
-                
+                Vector2Int pos = new Vector2Int(x,y);
+
+                if(_grid.Value(pos).IsEmpty) continue;
+
                 // Create a complex number with tile position
                 Complex v = new Complex(x, y);
                 
@@ -126,63 +241,31 @@ public class GridManager : MonoBehaviour
                 v *= m;
                 
                 // Converting the result to tile position Vector 2int
-                Vector2Int pos = new Vector2Int((int)v.Real, (int)v.Imaginary);
+                Vector2Int newPosition = new Vector2Int((int)v.Real, (int)v.Imaginary);
 
-                if (dir == 1)
+                Vector2Int direction = dir == 1 ? Vector2Int.up : Vector2Int.right;
+                newPosition += direction * (temp.GetLength(0) - 1);
+
+                foreach (ObjectInstance o in _grid.Value(pos).objects)
                 {
-                    pos += Vector2Int.up * (temp.GetLength(0) - 1);
-                } 
-                else
-                {
-                    pos += Vector2Int.right * (temp.GetLength(1) - 1);
+                    temp[newPosition.x, newPosition.y].AddObject(o);
                 }
-                
-                temp[pos.x, pos.y] = _grid[x, y];
-               
-                _grid[x, y].gridPos = pos;
             }
         }
         
         _grid = temp;
     }
-
-    private bool IsTileEmpty(Vector2Int pos) => _grid[pos.x, pos.y] == null;
-
-    private bool IsTileMovable(Vector2Int pos) => !_grid[pos.x, pos.y].data.isStatic;
-
-    private bool HasTileBelow(TileInstance t) => _grid[t.gridPos.x, t.gridPos.y + 1] != null;
-
-    private void MoveTileDown(TileInstance t)
+    
+    private bool IsTileEmpty(Vector2Int pos) => _grid.Value(pos).IsEmpty;
+    
+    private bool IsTileMovable(Vector2Int pos)
     {
-        bool beenMoved = false;
-        
-        while (true)
-        {
-            if (_grid[t.gridPos.x, t.gridPos.y + 1] == null)
-            {
-                Unsubscribe(t.gridPos);
-                t.gridPos = new Vector2Int(t.gridPos.x, t.gridPos.y + 1);
-                Subscribe(t, t.gridPos);
-                beenMoved = true;
-            }
-            else
-                break;
-        }
-        
-        if(beenMoved)
-            t.Move(GridToWorld(t.gridPos));
+        return _grid.Value(pos).objects.Any(x => x.data.isMovable && !x.data.isPassable);
     }
-
+    
     #region Calculations
 
-    private Vector3 GridToWorld(Vector2Int pos) => new Vector3(transform.position.x - _offset + pos.x, transform.position.y + _offset - pos.y, 0);
+    private Vector3 WorldPosition(Vector2Int pos) => new Vector3(transform.position.x - _offset + pos.x, transform.position.y + _offset - pos.y, 0);
 
     #endregion
-}
-
-public class GameManager : MonoBehaviour
-{
-    
-    public GridManager gridManager;
-    
 }

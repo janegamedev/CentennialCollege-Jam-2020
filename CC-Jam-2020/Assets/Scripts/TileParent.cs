@@ -3,6 +3,6 @@
 [System.Serializable]
 public class TileParent
 {
-    public TileType type;
+    public ObjectType type;
     public Transform parent;
 }

@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1880652585289286930}
   - component: {fileID: 1880652585289286931}
-  - component: {fileID: -1329115560526821619}
+  - component: {fileID: 861088332789366268}
   m_Layer: 0
   m_Name: Wall
   m_TagString: Untagged
@@ -72,8 +72,8 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: bdc47f6fd36f42546b541996152c2354, type: 3}
-  m_Color: {r: 0.49056602, g: 0.35603672, b: 0.18743324, a: 1}
+  m_Sprite: {fileID: 21300000, guid: 33988457bf3149a41ae3cda3546df3f8, type: 3}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -83,7 +83,7 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &-1329115560526821619
+--- !u!114 &861088332789366268
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -92,10 +92,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 1880652585289286932}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 20bd49397143421c820f5c6b5c4a9787, type: 3}
+  m_Script: {fileID: 11500000, guid: 7f1651fa07b14736968f7f159a15ab93, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   actionInProgress: {fileID: 11400000, guid: 528edd45b20f54e4a97af7ea296433ff, type: 2}
   data: {fileID: 0}
   gridPos: {x: 0, y: 0}
+  tile:
+    objects: []
   ease: 0
+  onPlayerMoved: {fileID: 11400000, guid: 035a432301974fc489d188df018e450e, type: 2}
