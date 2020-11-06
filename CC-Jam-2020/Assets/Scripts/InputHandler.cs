@@ -8,12 +8,15 @@ public class InputHandler : MonoBehaviour
     public BoolVariable actionInProgress;
     public WorldRotation worldRotation;
     public GridManagerVariable currentGrid;
-    
+    public GameManager gameManager;
     [BoxGroup("SOUND")] public AudioClip rotateSound, moveSound;
     [BoxGroup("SOUND")] public AudioManager audioManager;
     
     private void Update()
     {
+        if(Input.GetKeyDown(KeyCode.Escape))
+            gameManager.OnEsp();
+        
         if(actionInProgress.value || currentGrid.value == null) return;
         
         if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow))
@@ -44,5 +47,6 @@ public class InputHandler : MonoBehaviour
             audioManager.CallSfx(rotateSound);
         }
             
+        
     }
 }

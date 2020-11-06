@@ -9,8 +9,8 @@ public class DoorType : ObjectType
     
     public override void Interact(ObjectInstance inst)
     { 
-        if(!hasKey || !hasSoul) return;
-        
+        if(!hasKey.value || !hasSoul.value) return;
+
         hasKey.SetValue(false);
         Debug.Log("Here");
         roomCompleteEvent.Raise();

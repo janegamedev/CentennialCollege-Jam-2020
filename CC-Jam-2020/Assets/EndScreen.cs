@@ -13,13 +13,16 @@ public class EndScreen : MonoBehaviour
     public float speed, fade;
     public string myText, teddyText;
 
+    public bool doFade;
     public GameObject[] buttons;
     
     private void Awake()
     {
+        my.text = "";
+        teddy.text = "";
         StartCoroutine(PlayText());
-        teddyImage.DOFade(1, fade);
-        backgroundImage.DOFade(1, fade);
+        teddyImage.DOFade(1, fade).SetUpdate(true);
+        backgroundImage.DOFade(1, fade).SetUpdate(true);
     }
     
     IEnumerator PlayText()
@@ -27,15 +30,16 @@ public class EndScreen : MonoBehaviour
         foreach (char c in myText) 
         {
             my.text += c;
-            yield return new WaitForSeconds (speed);
+            yield return new WaitForSecondsRealtime (speed);
         }
 
-        my.DOFade(0, fade);
+        if(doFade)
+            my.DOFade(0, fade).SetUpdate(true);
         
         foreach (char c in teddyText) 
         {
             teddy.text += c;
-            yield return new WaitForSeconds (speed);
+            yield return new WaitForSecondsRealtime (speed);
         }
 
         foreach (GameObject button in buttons)

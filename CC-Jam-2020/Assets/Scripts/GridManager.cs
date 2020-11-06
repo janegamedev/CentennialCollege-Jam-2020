@@ -19,7 +19,7 @@ public class GridManager : MonoBehaviour
     [BoxGroup("TRANSFORMS")]
     [TableList] public TileParent[] parents;
     
-    [BoxGroup("VARIABLES")] public BoolVariable hasKey;
+    [BoxGroup("VARIABLES")] public BoolVariable hasKey, actionInProgress;
    
     private Tile[,] _grid;
     private List<ObjectInstance> _rotationRequired = new List<ObjectInstance>();
@@ -151,19 +151,7 @@ public class GridManager : MonoBehaviour
     public void AddCharacter(ObjectInstance c)
     {
         Vector2Int pos = setup.CharacterSpawn();
-        
-        /*float rotation = (playerInitRotation.z - transform.eulerAngles.z) / 90;
 
-        if (rotation != 0)
-        {
-            pos = pos - new Vector2Int(7, 7);
-        
-            for (int i = 0; i < rotation; i++)
-            {
-                pos = new Vector2Int(-pos.y, pos.x);
-            }
-        }*/
-        
         Vector3 worldPosition = WorldPosition(pos);
         
         Assign(c, pos);
@@ -175,22 +163,6 @@ public class GridManager : MonoBehaviour
         character.Move(worldPosition);
         SimulatePhysics();
     }
-    
-    /*public void PlaceKey()
-    {
-        Vector2Int pos = setup.KeyPosition();
-        Vector3 worldPosition = WorldPosition(pos);
-     
-        Object obj = setup.GetObject(pos.x, pos.y);
-
-        ObjectInstance inst = Instantiate(obj.prefab, worldPosition, obj.prefab.transform.rotation, parents.First(p => p.type == obj.type).parent).GetComponent<ObjectInstance>();
-        inst.SetObject(obj);
-        inst.name = $"{obj.tileName}";
-        
-        Assign(inst, pos);
-        _key = inst;
-        SimulatePhysics();
-    }*/
 
     public void SimulatePhysics()
     {
@@ -202,6 +174,8 @@ public class GridManager : MonoBehaviour
         else
             objects = _physicsApply.OrderBy(x=> x.gridPos.y).ToList();
 
+        bool isAnyMoved = false;
+        
         foreach (ObjectInstance obj in objects)
         {
             if (!_grid.Value(obj.gridPos + gravity.value).IsPassable()) continue;
@@ -218,9 +192,15 @@ public class GridManager : MonoBehaviour
                 else
                     break;
             }
+
+            if (!isAnyMoved)
+                isAnyMoved = true;
             
             obj.Move(WorldPosition(obj.gridPos));
         }
+        
+        if (isAnyMoved)
+            actionInProgress.SetValue(true);
     }
 
     public bool TryMoveObject(ObjectInstance obj, Vector2Int dir)
@@ -327,9 +307,7 @@ public class GridManager : MonoBehaviour
         
         _grid = temp;
     }
-    
-    private bool IsTileEmpty(Vector2Int pos) => _grid.Value(pos).IsEmpty;
-    
+
     private bool IsTileMovable(Vector2Int pos)
     {
         return _grid.Value(pos).objects.Any(x => x.data.isMovable && !x.data.isPassable);

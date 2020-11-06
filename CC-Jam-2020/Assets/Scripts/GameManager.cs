@@ -13,13 +13,15 @@ public class GameManager : MonoBehaviour
 
     [BoxGroup("EVENTS")] public GameEvent onNewRoomAssign, onPlayerEnterUnderworld, onKeyUpdated, onSoulUpdated;
 
-    public GameObject endCanvas;
+    public GameObject endCanvas, pauseCanvas;
     private GridManager prevRoom;
 
+    private bool isPaused;
     public AudioManager audioManager;
     
     private void Start()
     {
+        Cursor.visible = false;
         hasKey.SetValue(false);
         hasSoul.SetValue(true);
         
@@ -104,5 +106,13 @@ public class GameManager : MonoBehaviour
         actionInProgress.SetValue(true);
         endCanvas.SetActive(true);
         audioManager.OnGameWin();
+    }
+
+    public void OnEsp()
+    {
+        Time.timeScale = isPaused ? 1 : 0;
+        Cursor.visible = !isPaused;
+        pauseCanvas.SetActive(!isPaused);
+        isPaused = !isPaused;
     }
 }
