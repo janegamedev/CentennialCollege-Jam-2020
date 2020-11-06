@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1e6bd6e40e8f415a93fab63e864941fb, type: 3}
   m_Name: DoorType
   m_EditorClassIdentifier: 
-  clip: {fileID: 0}
+  clip: {fileID: 8300000, guid: 454c0c1542195f24b97288cafa2608ae, type: 3}
   messageVariable: {fileID: 11400000, guid: 521240450a16a7947a7ddd60cf563be3, type: 2}
   messageUpdated: {fileID: 11400000, guid: d8f44e56d86314b4fb228eb461415d1f, type: 2}
   precentage: 0.1

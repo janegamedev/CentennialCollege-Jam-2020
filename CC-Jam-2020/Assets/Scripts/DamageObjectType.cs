@@ -9,5 +9,7 @@ public class DamageObjectType : ObjectType
     public override void Interact(ObjectInstance inst)
     {
         deathEvent.Raise();
+        
+        base.Interact(inst);
     }
 }

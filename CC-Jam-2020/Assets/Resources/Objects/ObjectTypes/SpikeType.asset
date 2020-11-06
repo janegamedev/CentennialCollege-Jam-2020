@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6648da9d3ac94c1f8ecb769d71acb5e0, type: 3}
   m_Name: SpikeType
   m_EditorClassIdentifier: 
-  clip: {fileID: 0}
+  clip: {fileID: 8300000, guid: 24c5b47b3b660fa48b90157ca70ef9b9, type: 3}
   messageVariable: {fileID: 11400000, guid: 521240450a16a7947a7ddd60cf563be3, type: 2}
   messageUpdated: {fileID: 11400000, guid: d8f44e56d86314b4fb228eb461415d1f, type: 2}
   precentage: 0.8

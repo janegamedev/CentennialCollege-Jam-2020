@@ -740,6 +740,6 @@ MonoBehaviour:
     obj: {fileID: 11400000, guid: 3ba67039111d14b43865a4f43c56af6b, type: 2}
   - color: {r: 0, g: 1, b: 0, a: 1}
     obj: {fileID: 11400000, guid: 0eb665fe897745648853ef1377c0dcbe, type: 2}
-  CharacterSpawn: {x: 4, y: 9}
   character: {fileID: 11400000, guid: 645bca3a49473334da0c8a4bcdfc0843, type: 2}
   soul: {fileID: 11400000, guid: 0eb665fe897745648853ef1377c0dcbe, type: 2}
+  music: {fileID: 8300000, guid: 9070bd9dc37a32040b48e65094e9bbb0, type: 3}

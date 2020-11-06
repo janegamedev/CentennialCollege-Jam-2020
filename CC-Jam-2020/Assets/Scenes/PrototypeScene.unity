@@ -317,7 +317,7 @@ MonoBehaviour:
       m_Calls: []
   m_text: 
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 36aa228546abc6846a3e845ff7e17a88, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
@@ -381,7 +381,7 @@ MonoBehaviour:
   m_margin: {x: 0, y: 0, z: 0, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
-  m_hasFontAssetChanged: 0
+  m_hasFontAssetChanged: 1
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
 --- !u!222 &152316501
@@ -466,7 +466,7 @@ AudioSource:
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
-  m_PlayOnAwake: 1
+  m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1
   Loop: 0
@@ -563,9 +563,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c109e0906f7d3b646ae5b46b119cba4f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  currentGrid: {fileID: 0}
+  currentGrid: {fileID: 11400000, guid: 104026ee5ddc5cf45b49143b60ba2ecb, type: 2}
   source: {fileID: 205190772}
-  music: {fileID: 0}
+  music: {fileID: 205190774}
+  winMusic: {fileID: 0}
 --- !u!82 &205190774
 AudioSource:
   m_ObjectHideFlags: 0
@@ -577,10 +578,10 @@ AudioSource:
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
-  m_PlayOnAwake: 1
-  m_Volume: 1
+  m_PlayOnAwake: 0
+  m_Volume: 0.8
   m_Pitch: 1
-  Loop: 0
+  Loop: 1
   Mute: 0
   Spatialize: 0
   SpatializePostEffects: 0
@@ -1075,6 +1076,9 @@ MonoBehaviour:
   actionInProgress: {fileID: 11400000, guid: 528edd45b20f54e4a97af7ea296433ff, type: 2}
   worldRotation: {fileID: 1157118626}
   currentGrid: {fileID: 11400000, guid: 104026ee5ddc5cf45b49143b60ba2ecb, type: 2}
+  rotateSound: {fileID: 8300000, guid: 8d36f458165359149a276d7ffa09d937, type: 3}
+  moveSound: {fileID: 8300000, guid: 04cddc3a2f58dba4fb5b7225d5057c37, type: 3}
+  audioManager: {fileID: 205190773}
 --- !u!1 &555270280
 GameObject:
   m_ObjectHideFlags: 0
@@ -1848,8 +1852,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: 
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 36aa228546abc6846a3e845ff7e17a88, type: 2}
+  m_sharedMaterial: {fileID: -6276753663282794356, guid: 36aa228546abc6846a3e845ff7e17a88, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -2253,6 +2257,8 @@ MonoBehaviour:
   fade: 0.7
   target: {fileID: 11400000, guid: 521240450a16a7947a7ddd60cf563be3, type: 2}
   targetText: {fileID: 849143665}
+  thoughtsSound: {fileID: 8300000, guid: 10387829f24589e479329456d7c5c2fc, type: 3}
+  audioManager: {fileID: 205190773}
 --- !u!1 &1125361350
 GameObject:
   m_ObjectHideFlags: 0
@@ -2429,6 +2435,8 @@ MonoBehaviour:
   onPlayerEnterUnderworld: {fileID: 11400000, guid: 6e487e12393838f49b2f026215a4a3f8, type: 2}
   onKeyUpdated: {fileID: 11400000, guid: c8917a84899e5bd4c8ee2f6df368c0b2, type: 2}
   onSoulUpdated: {fileID: 11400000, guid: 038b6492c8c29d146b95164e60026406, type: 2}
+  endCanvas: {fileID: 1560535394}
+  audioManager: {fileID: 205190773}
 --- !u!114 &1157118626
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2706,7 +2714,7 @@ MonoBehaviour:
       m_Calls: []
   m_text: 
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 36aa228546abc6846a3e845ff7e17a88, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
@@ -2770,7 +2778,7 @@ MonoBehaviour:
   m_margin: {x: 0, y: 0, z: 0, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
-  m_hasFontAssetChanged: 0
+  m_hasFontAssetChanged: 1
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
 --- !u!222 &1336510914
@@ -2984,7 +2992,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   nextRoom: {fileID: 0}
   underworldRoom: {fileID: 1769020637}
-  setup: {fileID: 11400000, guid: 34d9dfa0b1895c14d862adc222e95a45, type: 2}
+  setup: {fileID: 11400000, guid: c13d09e0956e62240a088dd9339ffd1f, type: 2}
   gravity: {fileID: 11400000, guid: 2f6c2f19aacea1e47a715f5ad112c185, type: 2}
   playerInitRotation: {x: 0, y: 0, z: 180}
   eRotation: {x: -1, y: 0}
@@ -3491,7 +3499,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   nextRoom: {fileID: 1769020637}
   underworldRoom: {fileID: 1745288954}
-  setup: {fileID: 11400000, guid: a5233b5e06827284abaac3a4e6d055cc, type: 2}
+  setup: {fileID: 11400000, guid: 793bced2634f0be4e90ddc9d70045234, type: 2}
   gravity: {fileID: 11400000, guid: 7e1a04dfd42c28f4d9132b59844dc054, type: 2}
   playerInitRotation: {x: 0, y: 0, z: 0}
   eRotation: {x: 1, y: 0}
@@ -3972,7 +3980,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   nextRoom: {fileID: 1769020637}
   underworldRoom: {fileID: 1665471815}
-  setup: {fileID: 11400000, guid: 34d9dfa0b1895c14d862adc222e95a45, type: 2}
+  setup: {fileID: 11400000, guid: 503c532a2aaa44f4fa8f6dbe37fc0ff2, type: 2}
   gravity: {fileID: 11400000, guid: 2f6c2f19aacea1e47a715f5ad112c185, type: 2}
   playerInitRotation: {x: 0, y: 0, z: 180}
   eRotation: {x: -1, y: 0}
@@ -4099,7 +4107,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   nextRoom: {fileID: 0}
   underworldRoom: {fileID: 1525134059}
-  setup: {fileID: 11400000, guid: a5233b5e06827284abaac3a4e6d055cc, type: 2}
+  setup: {fileID: 11400000, guid: 99b3ef6f5f271f34f84e4ed8c45334ee, type: 2}
   gravity: {fileID: 11400000, guid: 7e1a04dfd42c28f4d9132b59844dc054, type: 2}
   playerInitRotation: {x: 0, y: 0, z: 0}
   eRotation: {x: 1, y: 0}

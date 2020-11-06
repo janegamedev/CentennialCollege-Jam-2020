@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using DG.Tweening;
+using Sirenix.OdinInspector;
 using TMPro;
 using UnityEngine;
 
@@ -9,6 +10,9 @@ public class UpdateTmpFromString : UIPropertyUpdater
     public float speed, fade;
     public StringVariable target;
     public TextMeshProUGUI targetText;
+    
+    [BoxGroup("SOUND")] public AudioClip thoughtsSound;
+    [BoxGroup("SOUND")] public AudioManager audioManager;
 
     [ContextMenu("Raise")]
     public override void Raise()
@@ -20,6 +24,8 @@ public class UpdateTmpFromString : UIPropertyUpdater
 
     IEnumerator PlayText()
     {
+        audioManager.CallSfx(thoughtsSound);
+        
         foreach (char c in target.value) 
         {
             targetText.text += c;

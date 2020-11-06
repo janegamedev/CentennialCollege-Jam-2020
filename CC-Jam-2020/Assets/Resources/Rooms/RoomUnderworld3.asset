@@ -742,4 +742,4 @@ MonoBehaviour:
     obj: {fileID: 11400000, guid: 0eb665fe897745648853ef1377c0dcbe, type: 2}
   character: {fileID: 11400000, guid: 645bca3a49473334da0c8a4bcdfc0843, type: 2}
   soul: {fileID: 11400000, guid: 0eb665fe897745648853ef1377c0dcbe, type: 2}
-  music: {fileID: 0}
+  music: {fileID: 8300000, guid: 9070bd9dc37a32040b48e65094e9bbb0, type: 3}

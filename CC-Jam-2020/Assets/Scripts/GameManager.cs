@@ -15,6 +15,8 @@ public class GameManager : MonoBehaviour
 
     public GameObject endCanvas;
     private GridManager prevRoom;
+
+    public AudioManager audioManager;
     
     private void Start()
     {
@@ -28,6 +30,7 @@ public class GameManager : MonoBehaviour
         currentGrid.SetValue(startingRoom);
         currentPlayer.SetValue(currentGrid.value.SpawnCharacter());
         onNewRoomAssign.Raise();
+        audioManager.OnRoomUpdated();
     }
     
     public void OnPlayerMoved()
@@ -55,6 +58,7 @@ public class GameManager : MonoBehaviour
         onSoulUpdated.Raise();
            
         onPlayerEnterUnderworld.Raise();
+        audioManager.OnRoomUpdated();
     }
     
     public void OnPortalUse()
@@ -72,6 +76,7 @@ public class GameManager : MonoBehaviour
         currentGrid.value.AddCharacter(currentPlayer.value);
         
         onPlayerEnterUnderworld.Raise();
+        audioManager.OnRoomUpdated();
     }
 
     public void OnRoomFinished()
@@ -91,11 +96,13 @@ public class GameManager : MonoBehaviour
         currentGrid.SetValue(currentGrid.value.nextRoom);
         currentPlayer.SetValue(currentGrid.value.SpawnCharacter());
         onNewRoomAssign.Raise();
+        audioManager.OnRoomUpdated();
     }
 
     private void OnGameWin()
     {
         actionInProgress.SetValue(true);
         endCanvas.SetActive(true);
+        audioManager.OnGameWin();
     }
 }
