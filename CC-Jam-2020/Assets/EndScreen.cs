@@ -16,7 +16,7 @@ public class EndScreen : MonoBehaviour
     public bool doFade;
     public GameObject[] buttons;
     
-    private void Awake()
+    private void OnEnable()
     {
         my.text = "";
         teddy.text = "";
