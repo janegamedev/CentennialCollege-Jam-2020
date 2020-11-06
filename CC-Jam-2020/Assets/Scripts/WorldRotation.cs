@@ -35,6 +35,8 @@ public class WorldRotation : MonoBehaviour
     {
         foreach (ObjectInstance obj in currentGrid.value.RotationRequired)
         {
+            if(obj == null) continue;
+            
             obj.OnRoomRotated(_rotation, defaultSpeed/3);
         }
 

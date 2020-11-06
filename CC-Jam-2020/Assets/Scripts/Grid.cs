@@ -73,6 +73,9 @@ public class Grid : SerializedScriptableObject
     }
 
 
+#if UNITY_EDITOR
+    
+
     private static int DrawTile(Rect rect, int index)
     {
         if (Event.current.type == EventType.MouseDown && rect.Contains(Event.current.mousePosition))
@@ -146,7 +149,10 @@ public class Grid : SerializedScriptableObject
 
         return index;
     }
+    
+#endif
 }
+
 
 [System.Serializable]
 public class ColorTile

@@ -178,6 +178,7 @@ public class GridManager : MonoBehaviour
         
         foreach (ObjectInstance obj in objects)
         {
+            if(obj == null) continue; 
             if (!_grid.Value(obj.gridPos + gravity.value).IsPassable()) continue;
             
             while (true)
