@@ -14,6 +14,7 @@ public class ObjectInstance : MonoBehaviour
 
     private Sequence _sequence;
 
+    private Animator _anim;
     private void OnEnable()
     {
         _sequence = DOTween.Sequence();
@@ -22,6 +23,8 @@ public class ObjectInstance : MonoBehaviour
     public void SetObject(Object d)
     {
         data = d;
+        if (data.isCharacter)
+            _anim = GetComponent<Animator>();
     }
 
     public void OnRoomRotated(int rot, float delay)
@@ -41,6 +44,21 @@ public class ObjectInstance : MonoBehaviour
         if(!actionInProgress.value)
             actionInProgress.SetValue(true);
         _sequence.Append(transform.DOMove(pos, 0.5f).SetEase(Ease.OutBack).OnComplete(OnMoveEnd));
+
+        if (data.isCharacter)
+        {
+            bool isFalling = Math.Abs(pos.y - transform.position.y) > 0.5f;
+            
+            if(!isFalling)
+            {
+                Vector3 scale = transform.localScale;
+                scale.x = pos.x > transform.position.x ? 1 : -1;
+                transform.localScale = scale;
+            }
+           
+            _anim.SetBool(isFalling? "falling" : "walking", true);
+        }
+        
     }
 
     private void OnMoveEnd()
@@ -50,6 +68,8 @@ public class ObjectInstance : MonoBehaviour
 
         if (data.isCharacter)
         {
+            _anim.SetBool("walking", false);
+            _anim.SetBool("falling", false);
             onPlayerMoved.Raise();
         }
     }

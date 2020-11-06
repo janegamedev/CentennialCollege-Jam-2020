@@ -7,6 +7,7 @@ public class SceneHandler : MonoBehaviour
     
     public void PlayGame()
     {
+        Time.timeScale = 1;
         SceneManager.LoadScene(gameScene);
     }
     
