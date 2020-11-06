@@ -9,6 +9,17 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4bb4e295521a409ab0eeb6543ceb0164, type: 3}
+  m_Script: {fileID: 11500000, guid: 1e6bd6e40e8f415a93fab63e864941fb, type: 3}
   m_Name: DoorType
   m_EditorClassIdentifier: 
+  clip: {fileID: 0}
+  messageVariable: {fileID: 11400000, guid: 521240450a16a7947a7ddd60cf563be3, type: 2}
+  messageUpdated: {fileID: 11400000, guid: d8f44e56d86314b4fb228eb461415d1f, type: 2}
+  precentage: 0.1
+  messages:
+  - "I\u2019m on my way Teddy, I\u2019ll find you soon!"
+  - "Nice! Let\u2019s get out of here!"
+  - The key worked!
+  hasKey: {fileID: 11400000, guid: c5680ca78af529d44af2e5f8ed46082e, type: 2}
+  hasSoul: {fileID: 11400000, guid: 5cce23bf9b0a9fb4fa237bbd8da8cfcb, type: 2}
+  roomCompleteEvent: {fileID: 11400000, guid: 85ef4e58ab9eccf4f864018ac9400687, type: 2}

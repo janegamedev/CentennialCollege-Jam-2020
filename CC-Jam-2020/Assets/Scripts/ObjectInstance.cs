@@ -1,4 +1,5 @@
-﻿using DG.Tweening;
+﻿using System;
+using DG.Tweening;
 using Scriptables;
 using UnityEngine;
 
@@ -10,7 +11,14 @@ public class ObjectInstance : MonoBehaviour
     public Tile tile;
     public Ease ease;
     public GameEvent onPlayerMoved;
-    
+
+    private Sequence _sequence;
+
+    private void OnEnable()
+    {
+        _sequence = DOTween.Sequence();
+    }
+
     public void SetObject(Object d)
     {
         data = d;
@@ -20,14 +28,19 @@ public class ObjectInstance : MonoBehaviour
     {
         Quaternion rotation = Quaternion.Euler(0, 0, -90 * rot);
         rotation *= transform.rotation;
-        transform.DORotateQuaternion(rotation, delay).SetEase(ease);
+        _sequence.Append(transform.DORotateQuaternion(rotation, delay).SetEase(ease));
+    }
+
+    public void SetRotation(Vector3 final, float delay)
+    {
+        _sequence.Append(transform.DORotate(final, delay).SetEase(ease));
     }
 
     public void Move(Vector3 pos)
     {
         if(!actionInProgress.value)
             actionInProgress.SetValue(true);
-        transform.DOMove(pos, 0.5f).SetEase(Ease.OutBack).OnComplete(OnMoveEnd);
+        _sequence.Append(transform.DOMove(pos, 0.5f).SetEase(Ease.OutBack).OnComplete(OnMoveEnd));
     }
 
     private void OnMoveEnd()
@@ -39,6 +52,11 @@ public class ObjectInstance : MonoBehaviour
         {
             onPlayerMoved.Raise();
         }
+    }
+
+    private void OnDisable()
+    {
+        _sequence.Kill();
     }
 
     public void DestroyObject()

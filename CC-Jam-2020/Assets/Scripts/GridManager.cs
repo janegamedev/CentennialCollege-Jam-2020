@@ -13,7 +13,9 @@ public class GridManager : MonoBehaviour
     [BoxGroup("SETTINGS")] public GridManager nextRoom, underworldRoom;
     [BoxGroup("SETTINGS")] public Grid setup;
     [BoxGroup("SETTINGS")] public Vector2IntVariable gravity;
-
+    [BoxGroup("SETTINGS")] public Vector3 playerInitRotation;
+    [BoxGroup("ROTATION")] public Vector2Int eRotation, qRotation;
+    
     [BoxGroup("TRANSFORMS")]
     [TableList] public TileParent[] parents;
     
@@ -26,6 +28,7 @@ public class GridManager : MonoBehaviour
 
     private float _offset;
     private bool _isInit;
+    private ObjectInstance _key;
     public List<ObjectInstance> RotationRequired => _rotationRequired;
    
     
@@ -40,6 +43,13 @@ public class GridManager : MonoBehaviour
     }
     
     private void Awake()
+    {
+        CreateRoom();
+        _isInit = true;
+        SimulatePhysics();
+    }
+
+    public void CreateRoom()
     {
         _grid = new Tile[setup.size, setup.size];
         _offset = setup.size / 2f - .5f;
@@ -57,9 +67,9 @@ public class GridManager : MonoBehaviour
          
                 Object obj = setup.GetObject(x, y);
                 
-                if (obj.isCharacter) continue;
+                if (obj.isCharacter || obj.isSoul) continue;
 
-                ObjectInstance inst = Instantiate(obj.prefab, worldPosition, Quaternion.identity, parents.First(p => p.type == obj.type).parent).GetComponent<ObjectInstance>();
+                ObjectInstance inst = Instantiate(obj.prefab, worldPosition, obj.prefab.transform.rotation, parents.First(p => p.type == obj.type).parent).GetComponent<ObjectInstance>();
                 inst.SetObject(obj);
                 inst.name = $"{obj.tileName}";
                 
@@ -69,22 +79,25 @@ public class GridManager : MonoBehaviour
                     _rotationRequired.Add(inst);
                 if(obj.isMovable)
                     _physicsApply.Add(inst);
+                if (obj.isKey)
+                    _key = inst;
             }
         }
 
         hasKey.SetValue(false);
-        _isInit = true;
-        SimulatePhysics();
     }
 
     public ObjectInstance SpawnCharacter()
     {
-        Vector2Int pos = setup.CharacterSpawn;
+        Vector2Int pos = setup.CharacterSpawn();
+        
+        // convert to current grid position 
+        
         Vector3 worldPosition = WorldPosition(pos);
 
         Object obj = setup.character;
 
-        ObjectInstance inst = Instantiate(obj.prefab, worldPosition, Quaternion.identity, parents.First(p => p.type == obj.type).parent).GetComponent<ObjectInstance>();
+        ObjectInstance inst = Instantiate(obj.prefab, worldPosition, obj.prefab.transform.rotation, parents.First(p => p.type == obj.type).parent).GetComponent<ObjectInstance>();
         inst.SetObject(obj);
         inst.name = $"{obj.tileName}";
                 
@@ -101,38 +114,106 @@ public class GridManager : MonoBehaviour
     {
         _physicsApply.Remove(character);
         _rotationRequired.Remove(character);
+        _key.DestroyObject();
+        _key = null;
         Unassign(character);
         character = null;
     }
 
+    public void PlaceSoul()
+    {
+        Vector2Int pos = character.gridPos;
+        Vector2Int[] soulSpawn = setup.SoulSpawnPos();
+
+        float distance = 0;
+        int maxIndex = 0;
+        for (int i = 0; i < soulSpawn.Length; i++)
+        {
+            float dis = (soulSpawn[i] - pos).magnitude;
+            if(dis < distance) continue;
+
+            distance = dis;
+            maxIndex = i;
+        }
+
+        Vector2Int spawnPosition = soulSpawn[maxIndex];
+        Vector3 worldPosition = WorldPosition(spawnPosition);
+
+        Object obj = setup.soul;
+
+        ObjectInstance inst = Instantiate(obj.prefab, worldPosition, obj.prefab.transform.rotation, parents.First(p => p.type == obj.type).parent).GetComponent<ObjectInstance>();
+        inst.SetObject(obj);
+        inst.name = $"{obj.tileName}";
+                
+        Assign(inst, spawnPosition);
+    }
+
     public void AddCharacter(ObjectInstance c)
     {
-        Vector2Int pos = setup.CharacterSpawn;
+        Vector2Int pos = setup.CharacterSpawn();
+        
+        /*float rotation = (playerInitRotation.z - transform.eulerAngles.z) / 90;
+
+        if (rotation != 0)
+        {
+            pos = pos - new Vector2Int(7, 7);
+        
+            for (int i = 0; i < rotation; i++)
+            {
+                pos = new Vector2Int(-pos.y, pos.x);
+            }
+        }*/
+        
         Vector3 worldPosition = WorldPosition(pos);
         
         Assign(c, pos);
         character = c;
         _physicsApply.Add(character);
         _rotationRequired.Add(character);
+        character.transform.SetParent(parents.First(x => x.type == character.data.type).parent);
+        character.SetRotation(playerInitRotation ,0.5f);
+        character.Move(worldPosition);
         SimulatePhysics();
     }
+    
+    /*public void PlaceKey()
+    {
+        Vector2Int pos = setup.KeyPosition();
+        Vector3 worldPosition = WorldPosition(pos);
+     
+        Object obj = setup.GetObject(pos.x, pos.y);
+
+        ObjectInstance inst = Instantiate(obj.prefab, worldPosition, obj.prefab.transform.rotation, parents.First(p => p.type == obj.type).parent).GetComponent<ObjectInstance>();
+        inst.SetObject(obj);
+        inst.name = $"{obj.tileName}";
+        
+        Assign(inst, pos);
+        _key = inst;
+        SimulatePhysics();
+    }*/
 
     public void SimulatePhysics()
     {
         if(_physicsApply.Count < 1 || !_isInit) return;
-        
-        List<ObjectInstance> objects = _physicsApply.OrderByDescending(x=> x.gridPos.y).ToList();
-        
+        List<ObjectInstance> objects;
+
+        if(gravity.value == Vector2Int.up)
+            objects = _physicsApply.OrderByDescending(x=> x.gridPos.y).ToList();
+        else
+            objects = _physicsApply.OrderBy(x=> x.gridPos.y).ToList();
+
         foreach (ObjectInstance obj in objects)
         {
-            if(!IsTileEmpty(obj.gridPos + gravity.value)) continue;
+            if (!_grid.Value(obj.gridPos + gravity.value).IsPassable()) continue;
             
             while (true)
             {
-                if (IsTileEmpty(obj.gridPos + gravity.value))
+                Tile nextTile = _grid.Value(obj.gridPos + gravity.value);
+                if (nextTile.IsPassable())
                 {
                     Unassign(obj);
                     Assign(obj, obj.gridPos + gravity.value);
+                    
                 }
                 else
                     break;
@@ -186,15 +267,6 @@ public class GridManager : MonoBehaviour
 
     public void CheckForPlayer()
     {
-        // Check for below stuff
-        List<ObjectInstance> below = _grid.Value(character.gridPos + gravity.value).objects;
-        
-        foreach (ObjectInstance instance in below)
-        {
-            instance.data.type.Interact(instance);
-        }
-        
-        //Check for key / door
         List<ObjectInstance> sameTile = _grid.Value(character.gridPos).objects;
 
         foreach (ObjectInstance instance in sameTile)
@@ -261,6 +333,23 @@ public class GridManager : MonoBehaviour
     private bool IsTileMovable(Vector2Int pos)
     {
         return _grid.Value(pos).objects.Any(x => x.data.isMovable && !x.data.isPassable);
+    }
+
+    public void ResetRoom()
+    {
+        foreach (Tile tile in _grid)
+        {
+            foreach (ObjectInstance o in tile.objects)
+            {
+                Destroy(o.gameObject);
+            }
+        }
+        
+        _physicsApply.Clear();
+        _rotationRequired.Clear();
+        
+        transform.localRotation = Quaternion.identity;
+        CreateRoom();
     }
     
     #region Calculations

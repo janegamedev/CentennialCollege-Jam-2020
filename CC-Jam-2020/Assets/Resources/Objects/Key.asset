@@ -15,7 +15,8 @@ MonoBehaviour:
   tileName: Key
   prefab: {fileID: 1880652585289286932, guid: 6a5eaf104985de642ae3c8e3c6390ba2, type: 3}
   type: {fileID: 11400000, guid: 3939dd6f38cc5a743b3b63c3c2a28674, type: 2}
-  requireRotation: 1
+  requireRotation: 0
   isMovable: 0
   isPassable: 1
   isCharacter: 0
+  isKey: 1

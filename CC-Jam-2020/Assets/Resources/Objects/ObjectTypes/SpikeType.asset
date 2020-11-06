@@ -12,5 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6648da9d3ac94c1f8ecb769d71acb5e0, type: 3}
   m_Name: SpikeType
   m_EditorClassIdentifier: 
-  hasKey: {fileID: 11400000, guid: c5680ca78af529d44af2e5f8ed46082e, type: 2}
+  clip: {fileID: 0}
+  messageVariable: {fileID: 11400000, guid: 521240450a16a7947a7ddd60cf563be3, type: 2}
+  messageUpdated: {fileID: 11400000, guid: d8f44e56d86314b4fb228eb461415d1f, type: 2}
+  precentage: 0.8
+  messages:
+  - "No...I can\u2019t go to sleep, not yet\u2026 I need to find Teddy\u2026"
+  - "Oww\u2026 How did I get here? It\u2019s so dark.. Teddy, are you there?"
+  - "Must...Keep...Going\u2026"
   deathEvent: {fileID: 11400000, guid: ed086d431ee54cf44abc4e14c2840808, type: 2}

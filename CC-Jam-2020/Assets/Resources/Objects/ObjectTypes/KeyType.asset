@@ -12,4 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e7c983c791d849a9aded2276d56e3c56, type: 3}
   m_Name: KeyType
   m_EditorClassIdentifier: 
+  clip: {fileID: 0}
+  messageVariable: {fileID: 11400000, guid: 521240450a16a7947a7ddd60cf563be3, type: 2}
+  messageUpdated: {fileID: 11400000, guid: d8f44e56d86314b4fb228eb461415d1f, type: 2}
+  precentage: 0.7
+  messages:
+  - Found it! Now I need to get to the door
+  - This key glows too brightly, but I think this has to be useful for something
+  - "A key? I think I saw the door that this key unlocks, I hope this works\u2026"
   hasKey: {fileID: 11400000, guid: c5680ca78af529d44af2e5f8ed46082e, type: 2}
+  onKeyUpdated: {fileID: 11400000, guid: c8917a84899e5bd4c8ee2f6df368c0b2, type: 2}

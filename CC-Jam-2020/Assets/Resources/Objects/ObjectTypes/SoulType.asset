@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8e38134f99104f65a069bfb3eb700894, type: 3}
+  m_Name: SoulType
+  m_EditorClassIdentifier: 
+  clip: {fileID: 0}
+  messageVariable: {fileID: 11400000, guid: 521240450a16a7947a7ddd60cf563be3, type: 2}
+  messageUpdated: {fileID: 11400000, guid: d8f44e56d86314b4fb228eb461415d1f, type: 2}
+  precentage: 0.5
+  messages:
+  - "My body\u2026 ! I\u2019m becoming whole again!"
+  - "Must put myself back together\u2026 Teddy is waiting for me"
+  - "This light\u2026 it feels familiar\u2026"
+  hasSoul: {fileID: 11400000, guid: 5cce23bf9b0a9fb4fa237bbd8da8cfcb, type: 2}
+  onSoulUpdated: {fileID: 11400000, guid: 038b6492c8c29d146b95164e60026406, type: 2}
